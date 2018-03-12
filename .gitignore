@@ -5,3 +5,5 @@
 
 /gradle/wrapper/
 /gradlew.bat
+
+/__injected/*/build/
