@@ -1,0 +1,4 @@
+[submodule "kotlin"]
+	path = kotlin
+	url = git@github.com:JetBrains/kotlin.git
+	ignore = dirty
