@@ -48,11 +48,11 @@ val bintrayGpgSign by propertyOrElse(true)
 val bintrayRepo = "kotlin-metadata"
 val bintrayTags = arrayOf("Kotlin")
 
-val bintrayUser: String? by lazy { System.getenv("BINTRAY_USER") }
-val bintrayKey: String? by lazy { System.getenv("BINTRAY_KEY") }
+val bintrayUser: String? = System.getenv("BINTRAY_USER")
+val bintrayKey: String? = System.getenv("BINTRAY_KEY")
 
-val sonatypeUser: String? by lazy { System.getenv("SONATYPE_USER") }
-val sonatypePassword: String? by lazy { System.getenv("SONATYPE_PASSWORD") }
+val sonatypeUser: String? = System.getenv("SONATYPE_USER")
+val sonatypePassword: String? = System.getenv("SONATYPE_PASSWORD")
 
 // set up external ant dependencies
 val updateDependencies by tasks.creating
