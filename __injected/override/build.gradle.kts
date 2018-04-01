@@ -28,8 +28,7 @@ val gitRepo: String by consts
 
 val taggedRepoUrl: String by consts
 
-val libShortName: String by consts
-val libLongName: String by consts
+val libName: String by consts
 val libDescription: String by consts
 val libUrl: String by consts
 
@@ -42,14 +41,15 @@ val libPackage: String by consts
 val publicationName: String by consts
 
 val authorName: String by consts
-val authorEmail: String by consts
-val authorUrl: String by consts
 
 val licenseName: String by consts
 val licenseUrl: String by consts
 
 val issuesSystem: String by consts
 val issuesUrl: String by consts
+
+val ciSystem: String by consts
+val ciUrl: String by consts
 
 val outputDir: File by consts
 
@@ -228,7 +228,7 @@ with(project(projectReflect)) {
         classifier = null
         // edit manifest
         manifest {
-            attributes["Implementation-Title"] = libShortName
+            attributes["Implementation-Title"] = libName
             attributes["Implementation-Version"] = kotlinVersion
             attributes["Implementation-CodeVersion"] = codeVersion
             attributes["Implementation-Vendor"] = authorName
@@ -287,7 +287,7 @@ with(project(projectReflect)) {
                 artifactId = libArtifactId
                 version = libVersion
                 pom.buildXml {
-                    "name"..libLongName
+                    "name"..libName
                     "description"..libDescription
                     "url"..libUrl
                     "licenses" {
@@ -300,12 +300,13 @@ with(project(projectReflect)) {
                         "system"..issuesSystem
                         "url"..issuesUrl
                     }
+                    "ciManagement" {
+                        "system"..ciSystem
+                        "url"..ciUrl
+                    }
                     "developers" {
                         "developer" {
                             "name"..authorName
-                            "email"..authorEmail
-                            "organization"..authorName
-                            "organizationUrl"..authorUrl
                         }
                     }
                     "scm" {
@@ -317,6 +318,7 @@ with(project(projectReflect)) {
                     "properties" {
                         "codeVersion"..codeVersion
                         "kotlinVersion"..kotlinVersion
+                        "gitTag"..gitTag
                         "gitSubmodulesStatus"..gitSubmoduleStatus()
                     }
                 }

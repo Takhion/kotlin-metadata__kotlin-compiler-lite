@@ -24,7 +24,7 @@ val gitRepo: String by consts
 
 val mainRepoUrl: String by consts
 
-val libShortName: String by consts
+val libName: String by consts
 val libDescription: String by consts
 val libUrl: String by consts
 
@@ -42,7 +42,7 @@ val bintrayPublish by propertyOrElse(true)
 val bintrayOverride by propertyOrElse(false)
 val bintrayDryRun by propertyOrElse(false)
 val bintrayMavenCentralSync by propertyOrElse(true)
-val bintrayMavenCentralClose by propertyOrElse(false)
+val bintrayMavenCentralClose by propertyOrElse(true)
 val bintrayGpgSign by propertyOrElse(true)
 
 val bintrayRepo = "kotlin-metadata"
@@ -112,7 +112,7 @@ configure<BintrayExtension> {
     }
     pkg {
         repo = bintrayRepo
-        name = libShortName
+        name = libName
         desc = libDescription
         websiteUrl = libUrl
         issueTrackerUrl = issuesUrl

@@ -20,8 +20,7 @@ val consts: Properties by extra(object : Properties() {
     val mainRepoUrl by "https://$gitHubRepoDomain"
     val taggedRepoUrl by "$mainRepoUrl/tree/$gitTag"
 
-    val libShortName by "kotlin-compiler-lite"
-    val libLongName by "kotlin-metadata:kotlin-compiler-lite"
+    val libName by "kotlin-compiler-lite"
     val libDescription by "A subset of the Kotlin compiler to be used by kotlin-metadata."
     val libUrl by mainRepoUrl
 
@@ -35,8 +34,6 @@ val consts: Properties by extra(object : Properties() {
     val publicationName by libArtifactId.split("-").joinToString("") { it.capitalize() }.decapitalize()
 
     val authorName by "Eugenio Marletti"
-    val authorEmail by "e.marletti@gmail.com"
-    val authorUrl by "https://github.com/$gitHubUser"
 
     val licenseName by "MIT"
     val licenseFile by superRootDir.resolve("LICENSE")
@@ -44,6 +41,9 @@ val consts: Properties by extra(object : Properties() {
 
     val issuesSystem by "GitHub"
     val issuesUrl by "$mainRepoUrl/issues"
+
+    val ciSystem by "CircleCI"
+    val ciUrl by "https://circleci.com/gh/$gitHubUser/$gitHubRepo"
 
     val kotlinDir by superRootDir.resolve("kotlin")
     val outputDir by superRootDir.resolve("build/out")
