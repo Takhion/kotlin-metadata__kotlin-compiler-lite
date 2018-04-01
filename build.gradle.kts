@@ -65,7 +65,7 @@ val publish by tasks.creating(GradleBuild::class) {
     outputs.dir(outputDir)
 
     doFirst {
-        // TODO remove once kotlin.init.gradle is rewritten in Kotlin
+        // TODO remove after finding a way to apply consts.gradle.kts to kotlin.init.gradle.kts
         // persist 'consts' properties since groovy files can't apply .kts scripts
         val storeableConsts = Properties()
         for ((key, value) in consts) {

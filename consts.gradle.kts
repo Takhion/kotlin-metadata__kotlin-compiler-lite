@@ -47,7 +47,7 @@ val consts: Properties by extra(object : Properties() {
 
     val kotlinDir by superRootDir.resolve("kotlin")
     val outputDir by superRootDir.resolve("build/out")
-    val initFile by superRootDir.resolve("kotlin.init.gradle")
+    val initFile by superRootDir.resolve("kotlin.init.gradle.kts")
 
     val injectedParent by "__injected"
     val injectedDir by superRootDir.resolve(injectedParent)
