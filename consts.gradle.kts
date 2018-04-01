@@ -7,7 +7,7 @@ import org.gradle.kotlin.dsl.getValue
 val superRootDir: File by extra
 val consts: Properties by extra(object : Properties() {
 
-    val codeVersion by "1.0.0"
+    val codeVersion by "1.0.1"
     val kotlinVersion by "1.2.31"
 
     val gitHubUser by "Takhion"
