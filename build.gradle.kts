@@ -46,7 +46,7 @@ val bintrayMavenCentralClose by propertyOrElse(true)
 val bintrayGpgSign by propertyOrElse(true)
 
 val bintrayRepo = "kotlin-metadata"
-val bintrayTags = arrayOf("Kotlin")
+val bintrayTags = arrayOf("kotlin", "kotlin-metadata")
 
 val bintrayUser: String? = System.getenv("BINTRAY_USER")
 val bintrayKey: String? = System.getenv("BINTRAY_KEY")
