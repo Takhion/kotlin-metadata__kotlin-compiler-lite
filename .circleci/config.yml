@@ -36,9 +36,6 @@ jobs:
             git submodule sync --recursive
             git submodule update --recursive --init
       - run:
-          name: Update external dependencies
-          command: ./gradlew --stacktrace updateDependencies
-      - run:
           name: Generate artifacts
           command: ./gradlew --stacktrace publish
       - store_artifacts:

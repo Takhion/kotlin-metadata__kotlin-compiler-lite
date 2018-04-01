@@ -54,20 +54,7 @@ val bintrayKey: String? = System.getenv("BINTRAY_KEY")
 val sonatypeUser: String? = System.getenv("SONATYPE_USER")
 val sonatypePassword: String? = System.getenv("SONATYPE_PASSWORD")
 
-// set up external ant dependencies
-val updateDependencies by tasks.creating
-kotlinDir.resolve("update_dependencies.xml").let { dependenciesFile ->
-    if (dependenciesFile.exists()) {
-        ant.importBuild(dependenciesFile)
-        updateDependencies.dependsOn(ant.project.defaultTarget)
-    }
-    else {
-        updateDependencies.doFirst { error("Dependencies file not found: '$dependenciesFile'") }
-    }
-}
-
 // execute inner build
-
 val publish by tasks.creating(GradleBuild::class) {
     dir = kotlinDir
     startParameter.apply {
@@ -138,7 +125,7 @@ val upload by tasks.creating {
     dependsOn("bintrayUpload")
 }
 
-defaultTasks(updateDependencies, publish)
+defaultTasks(publish)
 
 //region utils
 fun propertyOrElse(defaultValue: Boolean) =
