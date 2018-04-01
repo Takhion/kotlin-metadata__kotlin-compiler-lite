@@ -12,11 +12,12 @@ val consts: Properties by extra(object : Properties() {
 
     val gitHubUser by "Takhion"
     val gitHubRepo by "kotlin-metadata__kotlin-compiler-lite"
+    val gitHubRepoDomain by "github.com/$gitHubUser/$gitHubRepo"
 
     val gitTag by "v$codeVersion"
-    val gitRepo by "github.com/$gitHubUser/$gitHubRepo.git"
+    val gitRepo by "$gitHubRepoDomain.git"
 
-    val mainRepoUrl by "https://$gitRepo"
+    val mainRepoUrl by "https://$gitHubRepoDomain"
     val taggedRepoUrl by "$mainRepoUrl/tree/$gitTag"
 
     val libShortName by "kotlin-compiler-lite"
