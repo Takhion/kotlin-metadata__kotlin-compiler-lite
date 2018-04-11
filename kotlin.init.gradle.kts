@@ -9,8 +9,8 @@ val kotlinVersion = consts["kotlinVersion"] as String
 val injectedDir = consts["injectedDir"]!!.let(::file)
 val injectedModuleNames = consts["injectedModuleNames"].let { (it as String).split(":").toList() }
 
-val jdk6 = 16
-val jdk8 = 18
+val jdkMin = 6
+val jdkMax = 9
 
 gradle.settingsEvaluated {
     val projectNames = injectedModuleNames.map { addExtraProject(injectedDir, it) }
@@ -18,11 +18,17 @@ gradle.settingsEvaluated {
         extra["deployVersion"] = kotlinVersion
         log("set root extra deployVersion=$kotlinVersion")
 
-        (jdk6..jdk8).reversed().fold(System.getenv("JAVA_HOME")) { javaHome, jdk ->
-            val jdkEnv = "JDK_$jdk"
-            val jdkHome = findProperty(jdkEnv) as? String ?: System.getenv(jdkEnv) ?: javaHome
-            extra[jdkEnv] = jdkHome
-            log("set root extra $jdkEnv=$jdkHome")
+        (jdkMin..jdkMax).reversed().fold(System.getenv("JAVA_HOME")) { javaHome, jdk ->
+            val jdkEnvNew = "JDK_$jdk"
+            val jdkEnvOld = "JDK_1$jdk"
+            val jdkHome = null
+                ?: findProperty(jdkEnvNew) as? String
+                ?: findProperty(jdkEnvOld) as? String
+                ?: System.getenv(jdkEnvNew)
+                ?: System.getenv(jdkEnvOld)
+                ?: javaHome
+            extra[jdkEnvNew] = jdkHome
+            log("set root extra $jdkEnvNew=$jdkHome")
             jdkHome
         }
 
