@@ -58,14 +58,18 @@ val projectEmpty: String by consts
 val projectReflect: String by consts
 val projectReflectApi: String by consts
 val projectBuildCommon: String by consts
-val projectDeserialization: String by consts
 val projectDescriptorsRuntime: String by consts
+val projectUtilRuntime: String by consts
+val projectMetadata: String by consts
+val projectMetadataJvm: String by consts
 
 val srcCore = "$rootDir/core"
-val srcReflectApi = "$srcCore/reflection.jvm/src"
-val srcDescriptorsRuntime = "$srcCore/descriptors.runtime/src"
+val srcReflectionJvm = "$srcCore/reflection.jvm/src"
+val srcDescriptorsRuntime = project(projectDescriptorsRuntime).file("src").path!!
 
-val srcDirDeserializationFull = buildDir.resolve("deserialization-protobufs-full")
+val srcSetsDir = buildDir.resolve("src-sets")
+
+val taskWriteCompilerVersion: String by consts
 
 val taskCopyAnnotations = "copyAnnotations"
 val taskReflectShadowJar = "reflectShadowJar"
@@ -105,7 +109,7 @@ val regexTrimProtoImport = Regex("" +
         "\\s+" +                      // - space
         "\"" +                        // - 'quotes' char (opens)
         ")") +                        // - end group
-    "core/deserialization/src/" +     // text (to remove)
+    "core/metadata/src/" +            // text (to remove)
     ("(?<after>" +                    // start group ('**.proto"; ')
         ".+" +                        // - any text (proto path)
         "\\." +                       // - 'dot' char
@@ -135,9 +139,6 @@ val regexTrimDebugProtoClassName = Regex("" +
 //endregion
 //endregion
 
-evaluationDependsOn(projectReflect)         // for tasks
-evaluationDependsOn(projectDeserialization) // for srcSets
-
 val sourceProtobuf by configurations.creating
 val sourceJavaxInject by configurations.creating
 
@@ -146,34 +147,16 @@ dependencies {
     sourceJavaxInject(commonDep("javax.inject") + ":sources")
 }
 
+evaluationDependsOn(projectUtilRuntime) // for tasks
+project(projectUtilRuntime).tasks["compileJava"].dependsOn(taskWriteCompilerVersion)
+
+evaluationDependsOn(projectReflect) // for tasks
 val publishJars by tasks.creating {
     dependsOn("$projectReflect:$taskPublish")
     defaultTasks(this)
 }
 
-// create a copy of [projectDeserialization] srcDirs, plus: extra protos, full versions of compiled protos, protobuf sources
-val copyDeserializationSrcSets by tasks.creating(Copy::class) {
-    val mainSrcDirs = project(projectDeserialization)
-        .the<JavaPluginConvention>()
-        .sourceSets["main"]
-        .java
-        .srcDirs
-
-    val extraProtos = project(projectBuildCommon)
-        .projectDir
-        .resolve("src")
-        .asFileTree { include("**.proto") }
-        .files // flatten
-
-    val compiledProtosFull = project(projectBuildCommon)
-        .projectDir
-        .resolve("test")
-        .asFileTree {
-            include { it.name.matches(regexTrimDebugProtoFileName) }
-            rename(regexTrimDebugProtoFileName.toPattern(), "$1")
-            mapEachLine { it.replace(regexTrimDebugProtoClassName, "$1") }
-        }
-
+val srcDirMetadataOverride = project(projectMetadata).overrideSrcSets(srcSetsDir) {
     val pathProtoOriginal = packageProtoOriginal.packageToPath()
     val pathProtoJetbrains = packageProtoJetbrains.packageToPath()
     val sourcesProtobuf = sourceProtobuf.collect {
@@ -182,19 +165,17 @@ val copyDeserializationSrcSets by tasks.creating(Copy::class) {
         mapEachLine { it.replace(packageProtoOriginal, packageProtoJetbrains) }
     }
 
-    into(srcDirDeserializationFull)
-
-    from(mainSrcDirs)
-    from(extraProtos)
-    from(compiledProtosFull) { duplicatesStrategy = INCLUDE }
     from(sourcesProtobuf) { duplicatesStrategy = INCLUDE }
 }
 
-// force the enhanced srcDir
-with(project(projectDeserialization)) {
-    tasks["compileJava"]
-        .dependsOn(copyDeserializationSrcSets)
-        .doFirst { the<JavaPluginConvention>().sourceSets["main"].java.setSrcDirs(listOf(srcDirDeserializationFull)) }
+val srcDirMetadataJvmOverride = project(projectMetadataJvm).overrideSrcSets(srcSetsDir) {
+    val extraProtos = project(projectBuildCommon)
+        .projectDir
+        .resolve("src")
+        .asFileTree { include("**/java_descriptors.proto") }
+        .files // flatten
+
+    from(extraProtos)
 }
 
 with(project(projectReflect)) {
@@ -242,14 +223,19 @@ with(project(projectReflect)) {
         val packageJavaxInjectLib = packageJavaxInjectJetbrains.replaceFirst(packageJetbrains, packageLib)
         val pathJavaxOriginal = packageJavaxInjectOriginal.packageToPath()
         val pathJavaxInjectLib = packageJavaxInjectLib.packageToPath()
-        val sourcesJavaxInject = sourceJavaxInject.collect {
-            exclude("META-INF/**")
+        val sourcesJavaxInject = copySpec {
+            from(sourceJavaxInject.collect { exclude("META-INF/**") })
             eachFile { path = path.replace(pathJavaxOriginal, pathJavaxInjectLib) }
             mapEachLine { it.replace(packageJavaxInjectOriginal, packageJavaxInjectLib) }
         }
 
-        from(sourcesJavaxInject)
-        from(srcDirDeserializationFull) { duplicatesStrategy = INCLUDE }
+        with(sourcesJavaxInject)
+
+        dependsOn(srcDirMetadataOverride)
+        dependsOn(srcDirMetadataJvmOverride)
+
+        from(srcDirMetadataOverride) { duplicatesStrategy = INCLUDE }
+        from(srcDirMetadataJvmOverride) { duplicatesStrategy = INCLUDE }
 
         // relocate package paths
         eachFile { path = path.replace(pathReflectImpl, pathLib) }
@@ -269,7 +255,7 @@ with(project(projectReflect)) {
     val sourcesJar = (tasks[taskSourcesJar] as Jar).apply {
         // exclude unneeded dependencies
         includeEmptyDirs = false
-        excludeDir(srcReflectApi)
+        excludeDir(srcReflectionJvm)
         excludeDir(srcDescriptorsRuntime)
     }
 
@@ -328,6 +314,38 @@ with(project(projectReflect)) {
 }
 
 //region utils
+fun Project.pathParts(): List<String> =
+    ArrayList<String>(depth + 1).apply {
+        var project = project
+        while (true) {
+            add(0, project.name)
+            project = project.parent ?: break
+        }
+    }
+
+fun Project.overrideSrcSets(topDir: File, configure: Copy.() -> Unit): Copy {
+    evaluationDependsOn(path)
+
+    val srcDir = pathParts().fold(topDir) { dir, pathPart -> dir.resolve(pathPart) }
+
+    val copySrcSetsTask = createTask("__copySrcSets", Copy::class) {
+        from(mainSrcSet.java.srcDirs)
+        into(srcDir)
+        includeEmptyDirs = false
+        configure()
+    }
+
+    // force the enhanced srcDir
+    tasks["compileJava"]
+        .dependsOn(copySrcSetsTask)
+        .doFirst { mainSrcSet.java.setSrcDirs(listOf(srcDir)) }
+
+    return copySrcSetsTask
+}
+
+val Project.mainSrcSet: SourceSet
+    get() = the<JavaPluginConvention>().sourceSets["main"]
+
 fun File.asFileTree(configure: ConfigurableFileTree.() -> Unit = {}) = fileTree(this, configure)
 
 fun ContentFilterable.mapEachLine(transform: (String) -> String) = filter(transform)

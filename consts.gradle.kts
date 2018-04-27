@@ -63,6 +63,11 @@ val consts: Properties by extra(object : Properties() {
     val projectBuildCommon by ":kotlin-build-common"
     val projectDeserialization by ":core:deserialization"
     val projectDescriptorsRuntime by ":core:descriptors.runtime"
+    val projectUtilRuntime by ":core:util.runtime"
+    val projectMetadata by ":core:metadata"
+    val projectMetadataJvm by ":core:metadata.jvm"
+
+    val taskWriteCompilerVersion by ":prepare:build.version:writeCompilerVersion"
 
     operator fun <T> T.provideDelegate(thisRef: Properties, property: KProperty<*>) =
         object : ReadOnlyProperty<Properties, T> {

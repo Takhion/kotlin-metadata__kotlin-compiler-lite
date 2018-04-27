@@ -34,7 +34,7 @@ gradle.settingsEvaluated {
 
         project(projectNames.first()).afterEvaluate {
             this@rootProject.defaultTasks = defaultTasks
-            log("set default tasks on root project from project '$path': $defaultTasks")
+            log("set default tasks on root project from project '$path': ${this@rootProject.defaultTasks}")
         }
     }
 }

@@ -10,7 +10,7 @@ Wraps [JetBrains/kotlin] to produce a subset of the [Kotlin] compiler to be used
 
 + all Kotlin/Java sources, even for external dependencies
 + every package relocated under `me.eugeniomarletti.kotlin.metadata.shadow.*` in both compiled classes and sources
-+ "full" version of all [Protocol Buffers], instead of the "lite" one used by default (see [Options > `optimize_for` > `LITE_RUNTIME`](https://developers.google.com/protocol-buffers/docs/proto#options))
++ ~~"full" version of all [Protocol Buffers], instead of the "lite" one used by default (see [Options > `optimize_for` > `LITE_RUNTIME`](https://developers.google.com/protocol-buffers/docs/proto#options))~~ _(temporarily disabled until fixed)_
 + `.proto` files `package`/`import` directives fixed to reflect their relative locations (allows inspection through [the IDE](https://plugins.jetbrains.com/plugin/8277-protobuf-support))
 
 ## Download
