@@ -28,7 +28,9 @@ gradle.settingsEvaluated {
                 ?: System.getenv(jdkEnvOld)
                 ?: javaHome
             extra[jdkEnvNew] = jdkHome
+            extra[jdkEnvOld] = jdkHome
             log("set root extra $jdkEnvNew=$jdkHome")
+            log("set root extra $jdkEnvOld=$jdkHome")
             jdkHome
         }
 
