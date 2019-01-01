@@ -2,3 +2,4 @@
 	path = kotlin
 	url = git@github.com:JetBrains/kotlin.git
 	ignore = dirty
+	branch = v1.3.11

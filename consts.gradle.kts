@@ -8,7 +8,7 @@ val superRootDir: File by extra
 val consts: Properties by extra(object : Properties() {
 
     val codeVersion by "1.0.3"
-    val kotlinVersion by "1.2.40"
+    val kotlinVersion by "1.3.11"
 
     val gitHubUser by "Takhion"
     val gitHubRepo by "kotlin-metadata__kotlin-compiler-lite"
